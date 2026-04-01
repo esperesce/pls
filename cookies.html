@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Richiesta Speciale</title>
+    <style>
+        body {
+            background-color: #000;
+            color: white;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            z-index: 10;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            padding: 20px;
+        }
+
+        .cookie {
+            position: absolute;
+            top: -50px;
+            font-size: 2rem;
+            user-select: none;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Quando torno a casa potresti farmi dei cookies per favore? 🍪</h1>
+
+    <script>
+        function createCookie() {
+            const cookie = document.createElement('div');
+            cookie.classList.add('cookie');
+            cookie.innerText = '🍪';
+            
+            // Posizione orizzontale casuale
+            cookie.style.left = Math.random() * 100 + "vw";
+            
+            // Velocità di caduta casuale (tra 3 e 6 secondi)
+            const duration = Math.random() * 3 + 3;
+            cookie.style.animationDuration = duration + "s";
+            
+            // Grandezza casuale
+            cookie.style.fontSize = Math.random() * 20 + 20 + "px";
+
+            document.body.appendChild(cookie);
+
+            // Rimuove l'elemento dopo che è caduto per non appesantire la pagina
+            setTimeout(() => {
+                cookie.remove();
+            }, duration * 1000);
+        }
+
+        // Crea un nuovo biscotto ogni 200ms
+        setInterval(createCookie, 200);
+    </script>
+</body>
+</html>
