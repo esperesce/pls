@@ -2,55 +2,204 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accesso Riservato</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Protocollo Vale</title>
     <style>
+        /* Importazione font futuristico */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --bg-color: #050510;
+        }
+
         body {
-            background-color: #000;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
+            text-align: center;
         }
 
-        .container {
-            text-align: center;
+        .page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* STILI PAGINA 1 */
+        h1 {
+            font-size: 1.8rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+            margin-bottom: 40px;
+            max-width: 800px;
+            line-height: 1.5;
         }
 
         button {
             background: transparent;
-            color: #00ffcc;
-            border: 2px solid #00ffcc;
-            padding: 20px 40px;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            color: var(--neon-purple);
+            border: 2px solid var(--neon-purple);
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', sans-serif;
             cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             border-radius: 5px;
-            transition: 0.3s;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
-            text-decoration: none;
-            display: inline-block;
+            box-shadow: 0 0 10px var(--neon-purple) inset, 0 0 10px var(--neon-purple);
+            transition: all 0.3s ease;
+            /* Evita lo zoom su mobile quando si tappa velocemente */
+            touch-action: manipulation; 
         }
 
-        button:hover {
-            background: #00ffcc;
-            color: #000;
-            box-shadow: 0 0 40px rgba(0, 255, 204, 0.6);
-            transform: scale(1.05);
+        button:hover, button:active {
+            background: var(--neon-purple);
+            color: white;
+            box-shadow: 0 0 20px var(--neon-purple) inset, 0 0 40px var(--neon-purple);
+        }
+
+        /* STILI PAGINA 2 (GIOCO) */
+        #page2 {
+            display: none; /* Nascosta all'inizio */
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin-top: 0;
+        }
+
+        #score-board {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        #gameBox {
+            width: 90vw;
+            max-width: 400px;
+            height: 60vh;
+            max-height: 500px;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue) inset, 0 0 15px var(--neon-blue);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+        }
+
+        #target {
+            width: 50px;
+            height: 50px;
+            background-color: var(--neon-purple);
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 20px var(--neon-purple), 0 0 40px var(--neon-purple);
+            cursor: crosshair;
+            transition: top 0.1s, left 0.1s;
+            /* Per renderlo super reattivo su mobile */
+            touch-action: manipulation;
+        }
+
+        .btn-small {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            padding: 10px 20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <a href="cookies.html" target="_blank">
-            <button>Valentina, clicca il pulsante</button>
-        </a>
+    <div id="page1" class="page">
+        <h1>"Grazie Vale per i cookies ma non era necessario riaprire il sito"</h1>
+        <button onclick="avviaMainframe()">Avvia Mainframe</button>
     </div>
 
+    <div id="page2" class="page">
+        <h2>NEON CATCHER</h2>
+        <div id="score-board">Punteggio: <span id="score">0</span></div>
+        
+        <div id="gameBox">
+            <div id="target" onmousedown="colpisciBersaglio()" ontouchstart="colpisciBersaglio(event)"></div>
+        </div>
+
+        <button class="btn-small" onclick="tornaIndietro()">Chiudi Connessione</button>
+    </div>
+
+    <script>
+        let punteggio = 0;
+        let timerGioco;
+        let difficolta = 1000; // Tempo in ms prima che si sposti da solo
+
+        const page1 = document.getElementById('page1');
+        const page2 = document.getElementById('page2');
+        const scoreDisplay = document.getElementById('score');
+        const target = document.getElementById('target');
+        const gameBox = document.getElementById('gameBox');
+
+        // Funzione per cambiare pagina e avviare il gioco
+        function avviaMainframe() {
+            page1.style.display = 'none';
+            page2.style.display = 'flex';
+            punteggio = 0;
+            difficolta = 1000;
+            scoreDisplay.innerText = punteggio;
+            spostaBersaglio();
+        }
+
+        // Funzione per tornare alla prima pagina
+        function tornaIndietro() {
+            page2.style.display = 'none';
+            page1.style.display = 'flex';
+            clearTimeout(timerGioco);
+        }
+
+        // Funzione per spostare il bersaglio casualmente
+        function spostaBersaglio() {
+            const maxPosX = gameBox.clientWidth - target.clientWidth;
+            const maxPosY = gameBox.clientHeight - target.clientHeight;
+
+            const randomX = Math.floor(Math.random() * maxPosX);
+            const randomY = Math.floor(Math.random() * maxPosY);
+
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+
+            // Se non lo clicchi in tempo, si sposta da solo
+            clearTimeout(timerGioco);
+            timerGioco = setTimeout(spostaBersaglio, difficolta);
+        }
+
+        // Funzione chiamata quando il giocatore clicca/tocca il bersaglio
+        function colpisciBersaglio(event) {
+            // Previene il doppio click su dispositivi touch
+            if(event) event.preventDefault(); 
+            
+            punteggio++;
+            scoreDisplay.innerText = punteggio;
+            
+            // Aumenta un po' la velocità ogni 5 punti, fino a un limite
+            if (punteggio % 5 === 0 && difficolta > 400) {
+                difficolta -= 100; 
+            }
+            
+            // Sposta subito il bersaglio
+            spostaBersaglio();
+        }
+    </script>
 </body>
 </html>
